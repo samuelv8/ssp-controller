@@ -1,12 +1,12 @@
 import sys
 import heapq
-from Graph import Graph
+from Digraph import Digraph
 
 
-def dijkstra(G: Graph, frm, to):
+def dijkstra(G: Digraph, frm, to):
     """
     Dijkstra shortest path algorithm
-    :param G: Graph object
+    :param G: Digraph object
     :param frm: initial vertex
     :param to: target vertex
     :return: tuple with minimum distance and a list with the related shortest path
@@ -48,7 +48,7 @@ def dijkstra(G: Graph, frm, to):
 
 
 if __name__ == '__main__':
-    g = Graph()
+    g = Digraph()
     g.add_vertex('a')
     g.add_vertex('b')
     g.add_vertex('c')
@@ -67,4 +67,3 @@ if __name__ == '__main__':
 
     dmin, path = dijkstra(g, 'a', 'e')
     print(f'Min dist: {dmin}, Shortest path: {path}')
-

@@ -1,5 +1,5 @@
 
-class Graph:
+class Digraph:
     """
     Digraph class to be used in this approach
     """
@@ -37,4 +37,3 @@ class Graph:
         if u in self.adj_list:
             if v in self.adj_list[u]:
                 return self.adj_list[u][v]
-
