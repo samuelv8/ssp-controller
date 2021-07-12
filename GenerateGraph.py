@@ -21,5 +21,5 @@ if __name__ == '__main__':
     pos = {(i, j): np.array([i, j]) for (i,j) in G.nodes}
     nx.draw(G, pos, with_labels=True, edgecolors="black", node_color='white', font_size=10, node_size=1000)
     labels = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels, font_color='red')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels, font_color='red', label_pos=0.4)
     pyplot.show()
