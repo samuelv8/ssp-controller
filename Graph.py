@@ -26,9 +26,12 @@ class Graph:
         if v not in self.adj_list:
             self.n_vertices += 1
 
+    def get_vertices(self):
+        return [k for k in self.adj_list]
+
     def get_neighbors(self, u):
         if u in self.adj_list:
-            return [k for k, v in self.adj_list[u].items()]
+            return [k for k in self.adj_list[u]]
 
     def get_edge_weight(self, u, v):
         if u in self.adj_list:
