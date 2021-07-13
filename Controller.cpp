@@ -116,9 +116,12 @@ complex<double> saturate(complex<double> z, double n) {
 
 void attroots(vector<complex<double>> &zs, double w) {
     for (auto &z : zs) {
-        double r = normal(sqrt(w));
-        double theta = uniform(2 * M_PI);
-        complex<double> delta = polar(r, theta);
+        double x = normal(sqrt(w));
+        double y = normal(sqrt(w));
+        complex<double> delta = x + y * 1i;
+//        double r = normal(sqrt(w));
+//        double theta = uniform(2 * M_PI);
+//        complex<double> delta = polar(r, theta);
         z += delta;
         z = saturate(z, SIZE);
     }
@@ -157,8 +160,6 @@ bool ingraph(int i, int j, int n) {
     return false;
 }
 
-typedef pair<double, pair<int, pair<vector<complex<double> > *, graph_t *>>> pq_type;
-
 void print_graph(graph_t &g, ofstream &fs) {
     int V = (int) g.size();
 //    int E = 0;
@@ -174,6 +175,8 @@ void print_graph(graph_t &g, ofstream &fs) {
     }
 }
 
+typedef pair<double, pair<int, pair<vector<complex<double> > *, graph_t *>>> pq_type;
+
 double prescient(int u, int dest, graph_t &graph, vector<complex<double>> &zs, ofstream &fs) {
     priority_queue<pq_type> pq;
 
@@ -182,9 +185,9 @@ double prescient(int u, int dest, graph_t &graph, vector<complex<double>> &zs, o
     while (true) {
         g = pq.top();
         pq.pop();
-        print_graph(*g.s.s.s, fs);
-        fs << endl;
-        cout << g.s.f << " ";
+//        print_graph(*g.s.s.s, fs);
+//        fs << endl;
+//        cout << g.s.f << " ";
         if (g.s.f == dest) break;
         for (auto &e: (*g.s.s.s)[g.s.f]) {
             auto *ngp = new graph_t;
@@ -196,8 +199,8 @@ double prescient(int u, int dest, graph_t &graph, vector<complex<double>> &zs, o
             pq.push(mp(g.f - e.w, mp(e.j, mp(nzsp, ngp))));
         }
     }
-    cout << endl;
-    cout << endl;
+//    cout << endl;
+//    cout << endl;
     return -g.f;
 }
 
@@ -231,7 +234,11 @@ int main() {
         }
     }
     attedges(adj, zs);
-//    print_graph(adj);
+
+    ofstream graph_txt;
+    graph_txt.open("graph.txt", std::ios_base::out);
+    print_graph(adj, graph_txt);
+    graph_txt << endl;
 
     graph_t adj_init = adj;
 
@@ -248,8 +255,6 @@ int main() {
         attedges(adj, zs);
 //      cout << endl; print_graph(adj);
     }
-    ofstream graph_txt;
-    graph_txt.open("graph.txt", std::ios_base::out);
 //    cout << "T" _ T << endl;
     auto Tp = prescient(0, SIZE * SIZE - 1, adj_init, zs_init, graph_txt);
 //    cout << "T_presciente" _ Tp << endl;
