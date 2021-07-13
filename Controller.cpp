@@ -24,7 +24,11 @@ struct edges{
   edges(){}
 };
 
-void dijkstra(int p, vector < double > &d, vector < vector < edges > > &adj){
+
+typedef vector < vector < edges > > graph_t;
+
+
+void dijkstra(int p, vector < double > &d, graph_t &adj){
   d.assign(adj.size(),1e18);
   d[p] = 0;
   priority_queue < pair < double, int > > pq;
@@ -40,25 +44,31 @@ void dijkstra(int p, vector < double > &d, vector < vector < edges > > &adj){
     }
   }
 }
-
-std::default_random_engine generator;
+//std::uniform_int_distribution<int> d(0, 10);
+//
+std::random_device rd1;
+//
+//unsigned seed = d(rd1);
+//std::default_random_engine generator(seed);
 
 double normal(double stddev){
   std::normal_distribution<double> distribution(0,stddev);
-  return distribution(generator);
+  auto x = distribution(rd1);
+//  cout << "R" _ x << endl;
+  return x;
 }
 
-void attedges(double stddev, vector < vector < edges > > &adj){
+void attedges(double var, graph_t &adj){
   for(auto &n: adj){
     for(auto &e: n){
-      e.w = e.w + normal(stddev);
+      e.w = e.w + normal(sqrt(var));
       if (e.w<=0) e.w=0;
     }
   }
 }
 
-vector<vector<edges>> invert_graph(vector<vector<edges>> graph){
-  vector<vector<edges>> graph2;
+graph_t invert_graph(graph_t graph){
+  graph_t graph2;
   graph2.resize(graph.size());
   for(int i=0; i<graph.size(); i++){
     for(auto e: graph[i]){
@@ -68,7 +78,7 @@ vector<vector<edges>> invert_graph(vector<vector<edges>> graph){
   return graph2;
 }
 
-int controller(int u, int dest, vector < vector < edges > > &adj){
+int controller(int u, int dest, graph_t &adj, double &w){
   vector < double > d;
   auto invadj = invert_graph(adj);
   dijkstra(dest,d,invadj);
@@ -80,13 +90,33 @@ int controller(int u, int dest, vector < vector < edges > > &adj){
       goV = e.j;
     }
   }
-  cout << "MN" _ mn _ "AR" _ (mn-d[goV]) << endl;
+  w = mn - d[goV];
+//  cout << "MN" _ mn _ "AR" _ w << endl;
   return goV;
 }
 
 bool ingraph(int i, int j, int n){
   if(i>=0 and j>=0 and i<n and j<n) return true;
   return false;
+}
+
+double prescient(int u, int dest, graph_t & graph){
+    priority_queue<pair<double, pair<int, graph_t*> >> pq;
+
+    pq.push(mp(-0.0, mp(u, &graph)));
+    pair<double, pair<int, graph_t*> > g;
+    while (true){
+        g = pq.top(); pq.pop();
+        if (g.s.f == dest) break;
+
+        for (auto &e: (*g.s.s)[g.s.f]){
+            auto *ngp = new graph_t;
+            *ngp = *g.s.s;
+            attedges(e.w, *ngp);
+            pq.push(mp(g.f - e.w, mp(e.j, ngp)));
+        }
+    }
+    return -g.f;
 }
 
 int main(){
@@ -97,8 +127,8 @@ int main(){
   //freopen("B_15", "r", stdin);
   //freopen("15.out", "w", stdout);
 
-  vector < vector < edges > > adj;
-  int n = 6;
+  graph_t adj;
+  int n = 3;
   adj.resize(n*n);
   for(int i=0; i<n; i++){ // (i,j) 3*i+j
     for(int j=0; j<n; j++){
@@ -117,13 +147,25 @@ int main(){
       cout << e.j _ e.w << endl;
     }
   }*/
+  graph_t adj_init = adj;
   auto invadj = invert_graph(adj);
   int at=0;
-  while(1){
-    cout << '(' << at/n _ at%n << ')' << endl;
+  double T=0;
+  while(true){
+//    cout << '(' << at/n _ at%n << ')' << endl;
     if(at==n*n-1) break;
-    at = controller(at,n*n-1,adj);
-    attedges(5,adj);
+    double w;
+    at = controller(at,n*n-1,adj, w);
+    T += w;
+    attedges(w,adj);
   }
+//  cout << "T" _ T << endl;
+  auto Tp = prescient(0, n*n-1, adj_init);
+//  cout << "T_presciente" _ Tp << endl;
+
+  ofstream outdata;
+  outdata.open("dados.csv", std::ios_base::app);
+  outdata << T << ',' _ Tp << endl;
+  outdata.close();
 
 }
