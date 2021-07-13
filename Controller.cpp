@@ -27,6 +27,7 @@ struct edges{
 
 typedef vector < vector < edges > > graph_t;
 
+int SIZE = 3;
 
 void dijkstra(int p, vector < double > &d, graph_t &adj){
   d.assign(adj.size(),1e18);
@@ -44,12 +45,17 @@ void dijkstra(int p, vector < double > &d, graph_t &adj){
     }
   }
 }
-//std::uniform_int_distribution<int> d(0, 10);
+
 //
 std::random_device rd1;
 //
 //unsigned seed = d(rd1);
 //std::default_random_engine generator(seed);
+
+double uniform(double n){
+    std::uniform_real_distribution<double> uniform_dist(0, n);
+    return uniform_dist(rd1);
+}
 
 double normal(double stddev){
   std::normal_distribution<double> distribution(0,stddev);
@@ -58,13 +64,67 @@ double normal(double stddev){
   return x;
 }
 
-void attedges(double var, graph_t &adj){
-  for(auto &n: adj){
-    for(auto &e: n){
-      e.w = e.w + normal(sqrt(var));
-      if (e.w<=1) e.w=1;
+void eval_f(const vector<complex<double>> &zs, vector<vector<double>> &f) {
+    double K = 0.0;
+    for(int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            complex<double> z = (i + 0.5) + (j + 0.5) * 1i;
+            double tmp = 1;
+            for (auto zk : zs) {
+                tmp *= abs(z - zk);
+            }
+            tmp *= tmp; // abs^2 values
+            K += tmp;
+            f[i][j] = tmp;
+        }
     }
-  }
+    for(int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            f[i][j] /= K;
+        }
+    }
+}
+
+void attedges(graph_t &adj, vector<complex<double>> &zs){
+//  for(auto &SIZE: adj){
+//    for(auto &e: SIZE){
+//      e.w = e.w + normal(sqrt(var));
+//      if (e.w<=1) e.w=1;
+//    }
+//  }
+    vector<vector<double>> f(SIZE, vector<double>(SIZE, 0));
+    eval_f(zs, f);
+    for (int i = 0; i < adj.size(); ++i) {
+        for (int j = 0; j < adj[i].size(); ++j) {
+            adj[i][j].w = (f[i / SIZE][i % SIZE] + f[j / SIZE][j % SIZE]) / 2.0;
+        }
+    }
+}
+
+complex<double> saturate(complex<double> z, double n){
+    if(imag(z) < 0.0){
+        z = real(z) + 0.0 * 1i;
+    }
+    if(imag(z) > n){
+        z = real(z) + n * 1i;
+    }
+    if(real(z) < 0.0){
+        z = 0.0 + imag(z) * 1i;
+    }
+    if(real(z) > n){
+        z = n + imag(z) * 1i;
+    }
+    return z;
+}
+
+void attroots(vector<complex<double>> &zs, double w) {
+    for (auto & z : zs) {
+        double r = normal(sqrt(w));
+        double theta = uniform(2*M_PI);
+        complex<double> delta = polar(r, theta);
+        z += delta;
+        z = saturate(z, SIZE);
+    }
 }
 
 graph_t invert_graph(graph_t graph){
@@ -100,20 +160,25 @@ bool ingraph(int i, int j, int n){
   return false;
 }
 
-double prescient(int u, int dest, graph_t & graph){
-    priority_queue<pair<double, pair<int, graph_t*> >> pq;
+typedef pair< double, pair<int, pair<vector<complex<double> >*, graph_t*>>> pq_type;
 
-    pq.push(mp(-0.0, mp(u, &graph)));
-    pair<double, pair<int, graph_t*> > g;
+double prescient(int u, int dest, graph_t & graph, vector<complex<double>> & zs){
+    priority_queue<pq_type> pq;
+
+    pq.push(mp(-0.0, mp(u, mp(&zs, &graph))));
+    pq_type g;
     while (true){
         g = pq.top(); pq.pop();
 //        cout << g.s.f << " ";
         if (g.s.f == dest) break;
-        for (auto &e: (*g.s.s)[g.s.f]){
+        for (auto &e: (*g.s.s.s)[g.s.f]){
             auto *ngp = new graph_t;
-            *ngp = *g.s.s;
-            attedges(e.w, *ngp);
-            pq.push(mp(g.f - e.w, mp(e.j, ngp)));
+            *ngp = *g.s.s.s;
+            auto *nzsp = new vector<complex<double>>;
+            *nzsp = *g.s.s.f;
+            attroots(*nzsp, e.w);
+            attedges(*ngp, *nzsp);
+            pq.push(mp(g.f - e.w, mp(e.j, mp(nzsp, ngp))));
         }
     }
 //    cout << endl;
@@ -130,40 +195,44 @@ int main(){
   //freopen("15.out", "w", stdout);
 
   graph_t adj;
-  int n = 3;
-  adj.resize(n*n);
-  for(int i=0; i<n; i++){ // (i,j) 3*i+j
-    for(int j=0; j<n; j++){
+  adj.resize(SIZE * SIZE);
+  vector<complex<double>> zs;
+  zs.resize(SIZE);
+  for(int i = 0; i < SIZE; i++) {
+      zs[i] = uniform(SIZE) + uniform(SIZE) * 1i;
+  }
+  vector<complex<double>> zs_init = zs;
+  vector<vector<double>> f;
+
+  for(int i=0; i < SIZE; i++){ // (i,j) 3*i+j
+    for(int j=0; j < SIZE; j++){
       //(i+1,j), (i-1,j), (i,j-1), (i,j+1);
       vector < pi > DD{mp(i-1,j), mp(i+1,j), mp(i,j-1), mp(i,j+1)};
       for(pi nij: DD){
-        if(!ingraph(nij.f,nij.s,n)) continue;
+        if(!ingraph(nij.f, nij.s, SIZE)) continue;
         int ni=nij.f, nj=nij.s;
-        adj[n*i+j].pb(edges(n*ni+nj, max(double(0),20+(i+1)*(j+1)+normal(1))));
+        adj[SIZE * i + j].pb(edges(SIZE * ni + nj, 0));
       }
     }
   }
-  /*for(int i=0; i<adj.size(); i++){
-    cout << "N" _ i << endl;
-    for(auto e: adj[i]){
-      cout << e.j _ e.w << endl;
-    }
-  }*/
+  attedges(adj, zs);
   graph_t adj_init = adj;
+
   auto invadj = invert_graph(adj);
   int at=0;
   double T=0;
   while(true){
-//    cout << '(' << at/n _ at%n << ')' << endl;
-    if(at==n*n-1) break;
+//    cout << '(' << at/SIZE _ at%SIZE << ')' << endl;
+    if(at == SIZE * SIZE - 1) break;
     double w;
-    at = controller(at,n*n-1,adj, w);
+    at = controller(at, SIZE * SIZE - 1, adj, w);
     T += w;
-    attedges(w,adj);
+    attroots(zs, w);
+    attedges(adj, zs);
   }
-//  cout << "T" _ T << endl;
-  auto Tp = prescient(0, n*n-1, adj_init);
-//  cout << "T_presciente" _ Tp << endl;
+  cout << "T" _ T << endl;
+  auto Tp = prescient(0, SIZE * SIZE - 1, adj_init, zs_init);
+  cout << "T_presciente" _ Tp << endl;
 
   ofstream outdata;
   outdata.open("dados.csv", std::ios_base::app);
