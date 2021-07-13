@@ -1,25 +1,62 @@
+import os
 import networkx as nx
 import numpy as np
 from matplotlib import pyplot
+import sys
+
+def print_graph(f, filename):
+    G = nx.DiGraph()
+    for line in f:
+        i, j, w = map(float, line.strip('\n').split(' '))
+        i, j = map(int, [i, j])
+        G.add_edge(i, j, weight=w)
+
+    n = int(np.sqrt(len(G.nodes)))
+    pos = {i: np.array([i % n, i // n]) for i in G.nodes}
+    nx.draw(G, pos, with_labels=True, edgecolors="black", node_color='white', font_size=10, node_size=1000)
+    labels = nx.get_edge_attributes(G, 'weight')
+    labels = {k: round(v, 2) for (k,v) in labels.items()}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels, font_color='red', label_pos=0.4)
+    # pyplot.show()
+    path = os.path.join(os.getcwd(), f'{filename}.png')
+    pyplot.savefig(path, format='png')
 
 if __name__ == '__main__':
 
-    n = 8
+    filename = sys.argv[1]
 
-    G = nx.DiGraph()
-    for i in range(n):
-        for j in range(n):
-            G.add_node((i, j))
+    files = []
+    curr_file = []
+    with open(f'{filename}', 'r') as f:
+        for line in f:
+            if line.strip('\n'):
+                curr_file.append(line)
+            else:
+                files.append(curr_file.copy())
+                curr_file = []
 
-    for i in range(n):
-        for j in range(n):
-            x = [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
-            for y in x:
-                if 0 <= y[0] < n and 0 <= y[1] < n:
-                    G.add_edge((i, j), y, weight=(i+1)*(j+1))
+    folder = 'plots'
+    for i, file in enumerate(files):
+        print_graph(file, f'{folder}/graph{i}')
 
-    pos = {(i, j): np.array([i, j]) for (i,j) in G.nodes}
-    nx.draw(G, pos, with_labels=True, edgecolors="black", node_color='white', font_size=10, node_size=1000)
-    labels = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels, font_color='red', label_pos=0.4)
-    pyplot.show()
+
+
+
+    # n = 8
+    # G = nx.DiGraph()
+    # for i in range(n):
+    #     for j in range(n):
+    #         G.add_node((i, j))
+    #
+    # for i in range(n):
+    #     for j in range(n):
+    #         x = [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
+    #         for y in x:
+    #             if 0 <= y[0] < n and 0 <= y[1] < n:
+    #                 G.add_edge((i, j), y, weight=(i+1)*(j+1))
+    #
+    # pos = {(i, j): np.array([i, j]) for (i,j) in G.nodes}
+    # nx.draw(G, pos, with_labels=True, edgecolors="black", node_color='white', font_size=10, node_size=1000)
+    # labels = nx.get_edge_attributes(G, 'weight')
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels=labels, font_color='red', label_pos=0.4)
+    # pyplot.show()
