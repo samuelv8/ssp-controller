@@ -4,7 +4,7 @@ from matplotlib import pyplot
 
 if __name__ == '__main__':
 
-    n = 4
+    n = 8
 
     G = nx.DiGraph()
     for i in range(n):
