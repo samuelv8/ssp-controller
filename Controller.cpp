@@ -62,7 +62,7 @@ void attedges(double var, graph_t &adj){
   for(auto &n: adj){
     for(auto &e: n){
       e.w = e.w + normal(sqrt(var));
-      if (e.w<=0) e.w=0;
+      if (e.w<=1) e.w=1;
     }
   }
 }
@@ -107,8 +107,8 @@ double prescient(int u, int dest, graph_t & graph){
     pair<double, pair<int, graph_t*> > g;
     while (true){
         g = pq.top(); pq.pop();
+//        cout << g.s.f << " ";
         if (g.s.f == dest) break;
-
         for (auto &e: (*g.s.s)[g.s.f]){
             auto *ngp = new graph_t;
             *ngp = *g.s.s;
@@ -116,6 +116,8 @@ double prescient(int u, int dest, graph_t & graph){
             pq.push(mp(g.f - e.w, mp(e.j, ngp)));
         }
     }
+//    cout << endl;
+//    cout << endl;
     return -g.f;
 }
 
