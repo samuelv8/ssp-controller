@@ -6,7 +6,7 @@
 #define s second
 using pi = pair<int, int>;
 
-std::random_device rd1;
+std::random_device rd1; // random seed
 
 Plant::Plant(int n) {
     size = n;
@@ -55,7 +55,7 @@ void Plant::eval_f(vector<vector<double>> &F) {
             for (auto zk : zeros) {
                 tmp *= abs(z - zk);
             }
-            tmp *= tmp; // abs^2 values
+            tmp *= tmp;
             K += tmp;
             F[i][j] = tmp;
         }
@@ -101,9 +101,6 @@ void Plant::attroots(double w) {
         double x = normal(sqrt(w));
         double y = normal(sqrt(w));
         complex<double> delta = x + y * 1i;
-//        double r = normal(sqrt(w));
-//        double theta = uniform(2 * M_PI);
-//        complex<double> delta = polar(r, theta);
         z += delta;
         saturate(z, size);
     }

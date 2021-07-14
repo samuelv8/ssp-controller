@@ -4,6 +4,8 @@
 #define f first
 #define s second
 
+
+/// Basic Dijkstra shortest path algorithm.
 void dijkstra(int p, vector<double> &d, graph_t &adj) {
     d.assign(adj.size(), 1e18);
     d[p] = 0;
@@ -27,13 +29,13 @@ int controller(int u, int dest, Plant &plant, double &w) {
     plant.set_inverted();
     dijkstra(dest, d, plant.inverted_graph);
     double mn = 1e18;
-    int goV = -1;
+    int go = -1;
     for (auto &e: plant.graph[u]) {
         if (d[e.j] + e.w < mn) {
             mn = d[e.j] + e.w;
-            goV = e.j;
+            go = e.j;
         }
     }
-    w = mn - d[goV];
-    return goV;
+    w = mn - d[go];
+    return go;
 }

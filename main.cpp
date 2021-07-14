@@ -4,8 +4,10 @@
 
 #define _ << ' ' <<
 
+/// Main script.
 int main() {
-    int SIZE = 4;
+    int SIZE = 4; // grid size
+
     Plant plant(SIZE);
     Plant plant_init = plant;
 
@@ -16,6 +18,7 @@ int main() {
         graph_txt << endl;
     }
 
+    // Runs the controller policy for the plant.
     int at = 0;
     int last = SIZE * SIZE - 1;
     double T = 0;
@@ -31,12 +34,13 @@ int main() {
             graph_txt << endl;
         }
     }
+    // Runs the prescient algorithm for the initial plant.
     auto Tp = prescient(0, last, plant_init, graph_txt);
 
     if (PRINT) { graph_txt.close(); }
     ofstream outdata;
     outdata.open("dados.csv", std::ios_base::app);
-    outdata << T << ',' _ Tp << endl;
+    outdata << T << ',' _ Tp << endl; // appends the total costs in file
     outdata.close();
 }
 
