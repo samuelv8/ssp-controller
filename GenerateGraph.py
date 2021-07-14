@@ -1,3 +1,7 @@
+"""
+Auxiliary script to generate graph figures from the output of the main.cpp script
+"""
+
 import os
 import networkx as nx
 import numpy as np
