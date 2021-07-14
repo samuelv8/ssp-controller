@@ -4,7 +4,7 @@
 #define f first
 #define s second
 
-typedef pair<double, pair<int, Plant*>> pq_type;
+typedef pair<double, pair<int, Plant *>> pq_type;
 
 double prescient(int u, int dest, Plant &plant, ofstream &fs) {
     priority_queue<pq_type> pq;

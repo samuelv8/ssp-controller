@@ -26,14 +26,14 @@ int main() {
         plant.update_plant(w);
 //      cout << endl; print_graph(adj);
     }
-    cout << "T" _ T << endl;
+//    cout << "T" _ T << endl;
     auto Tp = prescient(0, last, plant_init, graph_txt);
-    cout << "T_presciente" _ Tp << endl;
+//    cout << "T_presciente" _ Tp << endl;
 //    graph_txt.close();
 
-//    ofstream outdata;
-//    outdata.open("dados.csv", std::ios_base::app);
-//    outdata << T << ',' _ Tp << endl;
-//    outdata.close();
+    ofstream outdata;
+    outdata.open("dados.csv", std::ios_base::app);
+    outdata << T << ',' _ Tp << endl;
+    outdata.close();
 }
 
