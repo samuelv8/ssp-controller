@@ -32,6 +32,8 @@ public:
 
     friend int controller(int u, int dest, Plant &plant, double &w);
 
+    friend void print_graph(Plant &plant, ofstream &fs);
+
 private:
     graph_t graph;
     graph_t inverted_graph;
@@ -51,7 +53,5 @@ private:
 double uniform(double n);
 
 double normal(double stddev);
-
-void print_graph(graph_t &g, ofstream &fs);
 
 #endif //SSP_CONTROLLER_PLANT_H

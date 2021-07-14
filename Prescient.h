@@ -2,6 +2,7 @@
 #define SSP_CONTROLLER_PRESCIENT_H
 
 #include "Plant.h"
+#include "PrintDefinitions.h"
 
 double prescient(int u, int dest, Plant &plant, ofstream &fs);
 

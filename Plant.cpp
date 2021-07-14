@@ -133,10 +133,9 @@ double normal(double stddev) {
     return distribution(rd1);
 }
 
-void print_graph(graph_t &g, ofstream &fs) {
-    int V = (int) g.size();
-    for (int i = 0; i < V; ++i) {
-        for (auto &e: g[i]) {
+void print_graph(Plant &plant, ofstream &fs) {
+    for (int i = 0; i < plant.graph.size(); ++i) {
+        for (auto &e: plant.graph[i]) {
             fs << i _ e.j _ e.w << endl;
         }
     }

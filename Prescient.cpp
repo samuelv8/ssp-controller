@@ -14,10 +14,10 @@ double prescient(int u, int dest, Plant &plant, ofstream &fs) {
     while (true) {
         g = pq.top();
         pq.pop();
-//        print_graph(*g.s.s.s, fs);
-//        fs << endl;
-//        cout << g.s.f << " ";
-//        cout.flush();
+        if (PRINT & PRSC) {
+            print_graph(*g.s.s, fs);
+            fs << endl;
+        }
         if (g.s.f == dest) break;
         for (auto &e: (g.s.s->graph)[g.s.f]) {
             auto npp = new Plant(*g.s.s);
