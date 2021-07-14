@@ -1,6 +1,6 @@
 # Projeto de Controlador para Obtenção de Caminho Mínimo em Grafo Estocástico
 
-Executa o controlador em malha fechada para um grafo estocástico em forma de grade com tamanho $n \times n$, com base no algoritmo de Dijkstra. Um algoritmo *presciente* realiza uma busca em largura para encontrar, dada uma realização das variáveis aleatórias (pesos das arestas), o melhor caminho possível no grafo. Os resultados do custo total de ambos são escritos no arquivo `dados.csv`.
+Executa o controlador em malha fechada para um grafo estocástico em forma de grade com tamanho n x n , com base no algoritmo de Dijkstra. Um algoritmo *presciente* realiza uma busca em largura para encontrar, dada uma realização das variáveis aleatórias (pesos das arestas), o melhor caminho possível no grafo. Os resultados do custo total de ambos são escritos no arquivo `dados.csv`.
 
 ## Execução do programa
 ### Linux
