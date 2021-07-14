@@ -29,6 +29,23 @@ Plant::Plant(int n) {
     attedges();
 }
 
+Plant::Plant(Plant &P) {
+    size = P.size;
+    zeros = P.zeros;
+    graph.resize(size * size);
+    for (int i = 0; i < P.graph.size(); ++i) {
+        for (auto e: P.graph[i]) {
+            graph[i].push_back(e);
+        }
+    }
+    inverted_graph.resize(size * size);
+    for (int i = 0; i < P.inverted_graph.size(); ++i) {
+        for (auto e: P.inverted_graph[i]) {
+            inverted_graph[i].push_back(e);
+        }
+    }
+}
+
 void Plant::eval_f(vector<vector<double>> &F) {
     double K = 0.0;
     for (int i = 0; i < size; i++) {
@@ -51,7 +68,7 @@ void Plant::eval_f(vector<vector<double>> &F) {
 }
 
 void Plant::attedges() {
-    vector<vector<double>> F(size, vector<double>(size, 0));
+    vector<vector<double>> F(size, vector<double>(size, 0.0));
     eval_f(F);
     for (int i = 0; i < graph.size(); ++i) {
         for (int j = 0; j < graph[i].size(); ++j) {
@@ -64,7 +81,7 @@ bool Plant::ingraph(int i, int j) {
     return (i >= 0 and j >= 0 and i < size and j < size);
 }
 
-complex<double> saturate(complex<double> z, double n) {
+void saturate(complex<double> &z, double n) {
     if (imag(z) < 0.0) {
         z = real(z) + 0.0 * 1i;
     }
@@ -77,7 +94,6 @@ complex<double> saturate(complex<double> z, double n) {
     if (real(z) > n) {
         z = n + imag(z) * 1i;
     }
-    return z;
 }
 
 void Plant::attroots(double w) {
@@ -89,13 +105,22 @@ void Plant::attroots(double w) {
 //        double theta = uniform(2 * M_PI);
 //        complex<double> delta = polar(r, theta);
         z += delta;
-        z = saturate(z, size);
+        saturate(z, size);
     }
 }
 
 void Plant::update_plant(double w) {
     attroots(w);
     attedges();
+}
+
+void Plant::set_inverted() {
+    inverted_graph.resize(graph.size());
+    for (int i = 0; i < graph.size(); i++) {
+        for (auto e: graph[i]) {
+            inverted_graph[e.j].push_back(edges(i, e.w));
+        }
+    }
 }
 
 double uniform(double n) {

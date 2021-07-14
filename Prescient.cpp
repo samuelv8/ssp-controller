@@ -17,12 +17,12 @@ double prescient(int u, int dest, Plant &plant, ofstream &fs) {
 //        print_graph(*g.s.s.s, fs);
 //        fs << endl;
 //        cout << g.s.f << " ";
+//        cout.flush();
         if (g.s.f == dest) break;
         for (auto &e: (g.s.s->graph)[g.s.f]) {
-            auto *np = new Plant(g.s.s->size);
-            *np = *g.s.s;
-            np->update_plant(e.w);
-            pq.push(mp(g.f - e.w, mp(e.j, np)));
+            auto npp = new Plant(*g.s.s);
+            npp->update_plant(e.w);
+            pq.push(mp(g.f - e.w, mp(e.j, npp)));
         }
     }
 //    cout << endl;

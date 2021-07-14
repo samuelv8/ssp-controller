@@ -2,6 +2,7 @@
 #define SSP_CONTROLLER_PLANT_H
 
 #include<bits/stdc++.h>
+
 using namespace std;
 
 struct edges {
@@ -9,6 +10,8 @@ struct edges {
     double w;
 
     edges(int j, double w) : j(j), w(w) {};
+
+    edges(const edges &e) = default;
 
     edges() = default;
 };
@@ -19,7 +22,11 @@ class Plant {
 public:
     Plant(int n);
 
+    Plant(Plant &P);
+
     void update_plant(double w);
+
+    void set_inverted();
 
     friend double prescient(int u, int dest, Plant &plant, ofstream &fs);
 
@@ -27,6 +34,7 @@ public:
 
 private:
     graph_t graph;
+    graph_t inverted_graph;
     int size;
     vector<complex<double>> zeros;
 
