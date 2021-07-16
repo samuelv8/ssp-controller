@@ -6,7 +6,7 @@
 
 /// Main script.
 int main() {
-    int SIZE = 4; // grid size
+    int SIZE = 3; // grid size
 
     Plant plant(SIZE);
     Plant plant_init = plant;
